@@ -1,4 +1,9 @@
 import 'dart:math';
+import 'package:latlong2/latlong.dart';
+
+import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
+
+import 'get_distance.dart';
 
 class Graph {
   Map<String, Vertex> vertices = {};
@@ -164,4 +169,50 @@ Map<Vertex, double> dijkstra(Graph g, Vertex source) {
   }
 
   return distance;
+}
+
+List<JohnsonResult> calculationJhonson(List<MapMarker> markers, int indexSrc) {
+  Graph graph = Graph();
+
+  for (var element in markers) {
+    graph.addVertex(element.title!);
+  }
+
+  for (int i = 0; i < markers.length; i++) {
+    for (int j = 0; j < markers.length; j++) {
+      graph.addEdge(
+        markers[i].title!,
+        markers[j].title!,
+        calculateDistance(
+          LatLng(
+            markers[i].location!.latitude,
+            markers[i].location!.longitude,
+          ),
+          LatLng(
+            markers[j].location!.latitude,
+            markers[j].location!.longitude,
+          ),
+        ),
+      );
+    }
+  }
+
+  var distance = johnson(graph);
+
+  List<JohnsonResult> shortestPath = [];
+  var fromSource = distance.keys
+      .firstWhere((element) => element.key == markers[indexSrc].title);
+  fromSource.pointsTo.forEach((key, value) {
+    shortestPath.add(JohnsonResult(key.key, value));
+  });
+
+  return shortestPath;
+}
+
+
+class JohnsonResult {
+  final String key;
+  final double value;
+
+  JohnsonResult(this.key,this.value);
 }

@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_mapbox_blog/constants/app_constants.dart';
 import 'package:flutter_mapbox_blog/helper/color_palette.dart';
 import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
+import 'package:flutter_mapbox_blog/routes.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
@@ -41,8 +42,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         actions: [
           InkWell(
             onTap: () {
-              result = calculationBellmanFord(mapMarkers, 0);
-              setState(() {});
+              Get.toNamed(Routes.result,arguments: mapMarkers);
             },
             child: const Icon(Icons.route),
           ),

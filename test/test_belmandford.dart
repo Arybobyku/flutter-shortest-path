@@ -1,38 +1,87 @@
 import 'package:flutter_mapbox_blog/helper/belmandford.dart';
 import 'package:flutter_mapbox_blog/helper/get_distance.dart';
+import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 
-
-// NEW
 void main() {
-  Graph graph = Graph();
-  graph.addEdge("A", "B",
-      calculateDistance( LatLng(40.6892, -74.0445),  LatLng(37.7749, -122.4194)));
-  graph.addEdge("A", "C",
-      calculateDistance( LatLng(40.6892, -74.0445),  LatLng(41.8781, -87.6298)));
-  graph.addEdge("B", "D",
-      calculateDistance(LatLng(37.7749, -122.4194), LatLng(39.9526, -75.1652)));
-  graph.addEdge("C", "D",
-      calculateDistance(LatLng(41.8781, -87.6298), LatLng(39.9526, -75.1652)));
+  List<LatLng> points = [
+    LatLng(40.7128, -74.0060), // New York City
+    LatLng(51.5074, -0.1278), // London
+    LatLng(35.6895, 139.6917), // Tokyo
+    LatLng(37.7749, -122.4194), // San Francisco
+    LatLng(-33.8688, 151.2093), // Sydney sydney
+  ];
 
-  Map<String, double> distances = graph.bellmanFord("A");
-  distances.forEach((key, value) {
-    print("Distance from A to $key: $value");
+  List<MapMarker> markers = [
+    MapMarker(
+        image: 'assets/images/restaurant_1.jpg',
+        title: 'Medan',
+        address: '8 Plender St, London NW1 0JT, United Kingdom',
+        location: MapMarker.toLatLng(3.407539653091186, 98.35273677975381),
+        rating: 4),
+    MapMarker(
+        image: 'assets/images/restaurant_2.jpg',
+        title: 'Aceh',
+        address: '103 Hampstead Rd, London NW1 3EL, United Kingdom',
+        location: MapMarker.toLatLng(4.906497303037172, 96.27943128787668),
+        rating: 5),
+    MapMarker(
+        image: 'assets/images/restaurant_3.jpg',
+        title: 'Pekan Baru',
+        address: '122 Palace Gardens Terrace, London W8 4RT, United Kingdom',
+        location: MapMarker.toLatLng(0.44752096452711254, 101.31109758186207),
+        rating: 2),
+    MapMarker(
+        image: 'assets/images/restaurant_4.jpg',
+        title: 'Padang',
+        address: '2 More London Riverside, London SE1 2AP, United Kingdom',
+        location: MapMarker.toLatLng(-0.9465288553484569, 100.48548742688283),
+        rating: 3),
+    MapMarker(
+      image: 'assets/images/restaurant_5.jpg',
+      title: 'Sidikalang',
+      address: '42 Kingsway, London WC2B 6EY, United Kingdom',
+      location: MapMarker.toLatLng(2.7522784482164693, 98.21330773632826),
+      rating: 4,
+    ),
+  ];
+
+  test("Test Belmandord", () {
+    Graph graph = Graph();
+
+    for (int i = 0; i < markers.length; i++) {
+      for (int j = 0; j < markers.length; j++) {
+        graph.addEdge(
+          markers[i].title!,
+          markers[j].title!,
+          calculateDistance(
+            LatLng(
+              markers[i].location!.latitude,
+              markers[i].location!.longitude,
+            ),
+            LatLng(
+              markers[j].location!.latitude,
+              markers[j].location!.longitude,
+            ),
+          ),
+        );
+      }
+    }
+
+    graph.currentGraph.forEach((key, value) {
+      print("Graph ${key}: \n  ${value} \n\n");
+    });
+
+    var src = markers[0].title!;
+
+    Map<String, double> distances = graph.bellmanFord(src);
+    distances.forEach((key, value) {
+      print("Distance from ${src} to $key: $value");
+    });
+  });
+
+  test("Test Jhonson", (){
+
   });
 }
-
-//OLD
-// void main() {
-//   Graph graph = Graph(5, 8);
-//   graph.addEdge(0, 1, -1);
-//   graph.addEdge(0, 2, 4);
-//   graph.addEdge(1, 2, 3);
-//   graph.addEdge(1, 3, 2);
-//   graph.addEdge(1, 4, 2);
-//   graph.addEdge(3, 2, 5);
-//   graph.addEdge(3, 1, 1);
-//   graph.addEdge(4, 3, -3);
-//
-//   BellmanFord bellmanFord = BellmanFord();
-//   bellmanFord.shortestPath(graph, 0);
-// }
