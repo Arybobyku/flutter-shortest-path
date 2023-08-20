@@ -200,13 +200,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 'assets/icons/map_marker.svg',
                               ),
                               const SizedBox(width: 10),
-                              Text(
-                                item.address ?? '',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
+                              Expanded(
+                                child: Text(
+                                  item.address ?? '',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),

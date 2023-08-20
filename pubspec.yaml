@@ -41,6 +41,8 @@ dependencies:
   shared_preferences:
   get_it:
   geocoding:
+  provider:
+  http:
 
 dev_dependencies:
   flutter_test:

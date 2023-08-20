@@ -53,20 +53,22 @@ void main(){
 
     for (int i = 0; i < markers.length; i++) {
       for (int j = 0; j < markers.length; j++) {
-        graph.addEdge(
-          markers[i].title!,
-          markers[j].title!,
-          calculateDistance(
-            LatLng(
-              markers[i].location!.latitude,
-              markers[i].location!.longitude,
+        if(markers[j].title != markers[0].title){
+          graph.addEdge(
+            markers[i].title!,
+            markers[j].title!,
+            calculateDistance(
+              LatLng(
+                markers[i].location!.latitude,
+                markers[i].location!.longitude,
+              ),
+              LatLng(
+                markers[j].location!.latitude,
+                markers[j].location!.longitude,
+              ),
             ),
-            LatLng(
-              markers[j].location!.latitude,
-              markers[j].location!.longitude,
-            ),
-          ),
-        );
+          );
+        }
       }
     }
 

@@ -171,7 +171,7 @@ Map<Vertex, double> dijkstra(Graph g, Vertex source) {
   return distance;
 }
 
-List<JohnsonResult> calculationJhonson(List<MapMarker> markers, int indexSrc) {
+Future<List<JohnsonResult>> calculationJhonson(List<MapMarker> markers, int indexSrc) async{
   Graph graph = Graph();
 
   for (var element in markers) {
