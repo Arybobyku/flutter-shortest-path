@@ -1,59 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_mapbox_blog/constants/app_constants.dart';
+import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
-class MapScreen extends StatelessWidget {
-  final LatLng source = LatLng(37.7749, -122.4194); // Source coordinates
-  final LatLng destination = LatLng(34.0522, -118.2437); // Destination coordinates
+class ResultMapPage extends StatefulWidget {
+  const ResultMapPage({Key? key}) : super(key: key);
+
+  @override
+  State<ResultMapPage> createState() => _ResultMapPageState();
+}
+
+class _ResultMapPageState extends State<ResultMapPage> {
+  final List<MapMarker> mapMarkers = Get.arguments;
+  List<LatLng> latlngList = [];
+
+  @override
+  void initState() {
+    mapMarkers.forEach((element) {
+      latlngList.add(element.location!);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Result Maps'),
+        title: const Text("Hasil Map"),
       ),
-      body: FlutterMap(
-        options: MapOptions(
-          center: source, // Center the map on the source coordinates
-          zoom: 6.0,
-        ),
-        layers: [
-          TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
+      body: Center(
+        child: FlutterMap(
+          options: MapOptions(
+            center: mapMarkers.first.location,
+            zoom: 12.0,
           ),
-          PolylineLayerOptions(
-            polylines: [
+          layers: [
+            TileLayerOptions(
+              urlTemplate:
+                  "https://api.mapbox.com/styles/v1/rambemanis29/{mapStyleId}/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}",
+              additionalOptions: {
+                'mapStyleId': AppConstants.mapBoxStyleId,
+                'accessToken': AppConstants.mapBoxAccessToken,
+              },
+            ),
+            MarkerLayerOptions(
+              markers: [
+                for (int i = 0; i < mapMarkers.length; i++)
+                  Marker(
+                    height: 40,
+                    width: 40,
+                    point: mapMarkers[i].location!,
+                    builder: (_) {
+                      return SvgPicture.asset(
+                        'assets/icons/map_marker.svg',
+                      );
+                    },
+                  ),
+              ],
+            ),
+            PolylineLayerOptions(polylines: [
               Polyline(
-                points: [source, destination], // List of LatLng points
-                color: Colors.blue, // Polyline color
-                strokeWidth: 3.0,   // Polyline width
-              ),
-            ],
-          ),
-          MarkerLayerOptions(
-            markers: [
-              Marker(
-                width: 80.0,
-                height: 80.0,
-                point: source,
-                builder: (ctx) => const Icon(
-                  Icons.location_pin,
-                  color: Colors.red,
-                ),
-              ),
-              Marker(
-                width: 80.0,
-                height: 80.0,
-                point: destination,
-                builder: (ctx) => const Icon(
-                  Icons.location_pin,
-                  color: Colors.green,
-                ),
-              ),
-            ],
-          ),
-        ],
+                points: latlngList,
+                // isDotted: true,
+                color: Color(0xFF669DF6),
+                strokeWidth: 3.0,
+                borderColor: Color(0xFF1967D2),
+                borderStrokeWidth: 0.1,
+              )
+            ])
+          ],
+        ),
       ),
     );
   }

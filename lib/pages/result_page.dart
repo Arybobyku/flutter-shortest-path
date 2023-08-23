@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mapbox_blog/helper/jhonson.dart';
 import 'package:flutter_mapbox_blog/provider/calculation_provider.dart';
+import 'package:flutter_mapbox_blog/routes.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,11 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
-  final List<MapMarker> mapMarkers = Get.arguments;
+  List<MapMarker> mapMarkers = Get.arguments;
+
+  List<bool> isExpandedBelmand = [];
+  List<bool> isExpandedJhonson = [];
+  List<MapMarker> mapResults = Get.arguments;
 
   @override
   void initState() {
@@ -25,12 +30,50 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Hasil"),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Get.toNamed(Routes.resultMap, arguments: mapResults);
+            },
+            child: const Icon(Icons.map),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ChangeNotifierProvider(
-            create:(context)=> CalculationProvider()..doCalculation(mapMarkers),
+            create: (context) =>
+                CalculationProvider()..doCalculation(mapMarkers),
             child: Consumer<CalculationProvider>(
-              builder: (context,value,_) {
+              builder: (context, value, _) {
+                List<MapEntry<String, double>>? parent = value.belmanford
+                    ?.where((element) => !element.key.contains('Node'))
+                    .toList();
+
+                parent?.forEach((element) {
+                  isExpandedBelmand.add(false);
+                });
+
+                mapResults = [];
+
+                mapResults.add(mapMarkers.first);
+                parent?.forEach((element) {
+                  var map = mapMarkers.firstWhere((map) => map.title == element.key);
+                  mapResults.add(map);
+                });
+
+                List<JohnsonResult>? parentJhonson = value.jhonson
+                    .where((element) =>
+                        !element.key.contains('Node') &&
+                        !element.key.contains("${mapMarkers.first.title}"))
+                    .toList();
+
+                parentJhonson.forEach((element) {
+                  isExpandedJhonson.add(false);
+                });
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: value.isLoadingJhonson || value.isLoadingBelmandFord
@@ -48,22 +91,29 @@ class _ResultPageState extends State<ResultPage> {
                             ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: value.belmanford?.length ?? 0,
-                              itemBuilder: (context, index) {
+                              itemCount: parent?.length ?? 0,
+                              itemBuilder: (context, parentIndex) {
+                                List<MapEntry<String, double>>? child = value
+                                    .belmanford
+                                    ?.where((element) => element.key
+                                        .contains(parent![parentIndex].key))
+                                    .toList();
                                 return Column(
                                   children: [
                                     Card(
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              value.belmanford![index].key,
-                                              style: const TextStyle(fontSize: 12),
+                                              parent![parentIndex].key,
+                                              style:
+                                                  const TextStyle(fontSize: 12),
                                             ),
                                             Text(
-                                              "${value.belmanford![index].value} KM",
+                                              "${parent[parentIndex].value} Meter",
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.bold,
@@ -73,14 +123,74 @@ class _ResultPageState extends State<ResultPage> {
                                         ),
                                       ),
                                     ),
-                                     Text("Lihat Node"),
+                                    GestureDetector(
+                                      onTap: () => setState(
+                                        () {
+                                          isExpandedBelmand[parentIndex] =
+                                              !isExpandedBelmand[parentIndex];
+                                        },
+                                      ),
+                                      child: const Text('Detail'),
+                                    ),
+                                    if (isExpandedBelmand[parentIndex])
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: child?.length ?? 0,
+                                        itemBuilder: (context, index) {
+                                          return Column(
+                                            children: [
+                                              Container(
+                                                width: double.infinity,
+                                                margin: const EdgeInsets.only(
+                                                    left: 40,
+                                                    right: 5,
+                                                    top: 5,
+                                                    bottom: 5),
+                                                color: Colors.green,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        child![index]
+                                                            .key
+                                                            .split(parent[
+                                                                    parentIndex]
+                                                                .key)
+                                                            .first,
+                                                        style: const TextStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                      Text(
+                                                        "${child[index].value} Meter",
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
                                   ],
                                 );
                               },
                             ),
                             Text(
                               "${value.time1.elapsed}",
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 20),
                             const Text(
@@ -90,38 +200,110 @@ class _ResultPageState extends State<ResultPage> {
                             ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: value.jhonson.length,
-                              itemBuilder: (context, index) {
-                                return Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "${value.jhonson[index].key} KM",
-                                          style: const TextStyle(fontSize: 12),
+                              itemCount: parentJhonson.length,
+                              itemBuilder: (context, parentIndex) {
+                                List<JohnsonResult>? child = value.jhonson
+                                    .where((element) => element.key
+                                        .contains(parent![parentIndex].key))
+                                    .toList();
+
+                                return Column(
+                                  children: [
+                                    Card(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${parentJhonson[parentIndex].key}",
+                                              style:
+                                                  const TextStyle(fontSize: 12),
+                                            ),
+                                            Text(
+                                              "${value.jhonson.where((element) => element.key == "Node ${parentJhonson[parentIndex].key} 0").first.value} Meter",
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
                                         ),
-                                        Text(
-                                          "${value.jhonson[index].value} KM",
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                    GestureDetector(
+                                      onTap: () => setState(
+                                        () {
+                                          isExpandedJhonson[parentIndex] =
+                                              !isExpandedJhonson[parentIndex];
+                                        },
+                                      ),
+                                      child: const Text('Detail'),
+                                    ),
+                                    if (isExpandedJhonson[parentIndex])
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: child.length,
+                                        itemBuilder: (context, index) {
+                                          return Column(
+                                            children: [
+                                              Container(
+                                                width: double.infinity,
+                                                margin: const EdgeInsets.only(
+                                                    left: 40,
+                                                    right: 5,
+                                                    top: 5,
+                                                    bottom: 5),
+                                                color: Colors.green,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        child[index]
+                                                            .key
+                                                            .split(parentJhonson[
+                                                                    parentIndex]
+                                                                .key)
+                                                            .first,
+                                                        style: const TextStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                      Text(
+                                                        "${child[index].value} Meter",
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                  ],
                                 );
                               },
                             ),
                             Text(
                               "${value.time2.elapsed}",
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                 );
-              }
+              },
             ),
           ),
         ),

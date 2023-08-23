@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:latlong2/latlong.dart';
 
+import 'package:http/http.dart' as http;
 import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
 
 import 'get_distance.dart';
@@ -171,48 +173,73 @@ Map<Vertex, double> dijkstra(Graph g, Vertex source) {
   return distance;
 }
 
-Future<List<JohnsonResult>> calculationJhonson(List<MapMarker> markers, int indexSrc) async{
+Future<List<JohnsonResult>> calculationJhonson(
+    List<MapMarker> markers, int indexSrc) async {
   Graph graph = Graph();
 
   for (var element in markers) {
     graph.addVertex(element.title!);
   }
 
-  for (int i = 0; i < markers.length; i++) {
-    for (int j = 0; j < markers.length; j++) {
-      graph.addEdge(
-        markers[i].title!,
-        markers[j].title!,
-        calculateDistance(
-          LatLng(
-            markers[i].location!.latitude,
-            markers[i].location!.longitude,
-          ),
-          LatLng(
-            markers[j].location!.latitude,
-            markers[j].location!.longitude,
-          ),
-        ),
-      );
+  for (int i = 1; i < markers.length; i++) {
+    final srcLat = markers[0].location!.latitude;
+    final srcLng = markers[0].location!.longitude;
+
+    final desLat = markers[i].location!.latitude;
+    final desLng = markers[i].location!.longitude;
+
+    final url =
+        'https://api.mapbox.com/directions/v5/mapbox/driving/$srcLng,$srcLat;$desLng,$desLat?access_token=pk.eyJ1IjoicmFtYmVtYW5pczI5IiwiYSI6ImNsZjVpeXZmMDFjcGEzdGxjNnVnNThtc28ifQ.7CwNZzs3T5WmqjOiYYrjGA&steps=true&language=IDN';
+    final http.Response response = await http.get(Uri.parse(url));
+    final Map<String, dynamic> data = json.decode(response.body);
+
+    final steps = data['routes'][0]['legs'][0]['steps'];
+
+    for (int step = steps.length - 1; step > 0; step--) {
+      graph.addVertex("Node ${markers[i].title} ${step - 1}");
+      if (step == steps.length - 1) {
+        graph.addEdge(
+          markers[0].title!,
+          "Node ${markers[i].title} ${step - 1}",
+          steps[step]['distance'].toDouble(),
+        );
+      } else {
+        graph.addEdge(
+          markers[i].title!,
+          "Node ${markers[i].title} $step",
+          steps[step]['distance'].toDouble(),
+        );
+
+        if (step - 1 >= 0) {
+          graph.addEdge(
+            "Node ${markers[i].title} $step",
+            "Node ${markers[i].title} ${step - 1}",
+            steps[step]['distance'].toDouble(),
+          );
+        } else {
+          graph.addEdge(
+            "Node ${markers[i].title} $step",
+            markers[i].title!,
+            steps[step]['distance'].toDouble(),
+          );
+        }
+      }
     }
   }
 
   var distance = johnson(graph);
 
   List<JohnsonResult> shortestPath = [];
-  var fromSource = distance.keys
-      .firstWhere((element) => element.key == markers[indexSrc].title);
-  fromSource.pointsTo.forEach((key, value) {
+  distance.values.first.forEach((key, value) {
     shortestPath.add(JohnsonResult(key.key, value));
   });
 
   return shortestPath;
 }
 
-
 class JohnsonResult {
   final String key;
   final double value;
 
-  JohnsonResult(this.key,this.value);
+  JohnsonResult(this.key, this.value);
 }
