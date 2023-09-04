@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mapbox_blog/helper/directions_handler.dart';
 import 'package:flutter_mapbox_blog/helper/jhonson.dart';
 import 'package:flutter_mapbox_blog/provider/calculation_provider.dart';
 import 'package:flutter_mapbox_blog/routes.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-import '../helper/belmandford.dart';
 import '../models/map_marker_model.dart';
 
 class ResultPage extends StatefulWidget {
@@ -29,24 +29,28 @@ class _ResultPageState extends State<ResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Hasil"),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              // Get.toNamed(Routes.resultMap, arguments: mapResults);
-              Get.toNamed(Routes.navigation, arguments: mapResults);
-            },
-            child: const Icon(Icons.map),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: ChangeNotifierProvider(
-            create: (context) =>
-                CalculationProvider()..doCalculation(mapMarkers),
+    return ChangeNotifierProvider(
+      create: (context) =>
+      CalculationProvider()..doCalculation(mapMarkers),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Hasil"),
+          actions: [
+            Consumer<CalculationProvider>(
+                builder: (context, value, _) {
+                return value.isLoadingMap ? const CircularProgressIndicator() : GestureDetector(
+                  onTap: () async {
+                    final result = await context.read<CalculationProvider>().getDirectionsMap(mapMarkers);
+                    Get.toNamed(Routes.navigation, arguments: result);
+                  },
+                  child: const Icon(Icons.map),
+                );
+              }
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
             child: Consumer<CalculationProvider>(
               builder: (context, value, _) {
                 List<MapEntry<String, double>>? parent = value.belmanford

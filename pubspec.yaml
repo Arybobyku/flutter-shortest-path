@@ -41,6 +41,7 @@ dependencies:
   shared_preferences:
   get_it:
   geocoding:
+  geolocator:
   provider:
   carousel_slider:
   flutter_dotenv:
@@ -48,6 +49,7 @@ dependencies:
   mapbox_gl:
   http:
   permission_handler:
+  dio:
 
 dev_dependencies:
   flutter_test:

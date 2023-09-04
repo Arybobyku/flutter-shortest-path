@@ -1,15 +1,8 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_mapbox_blog/constants/restaurants.dart';
-import 'package:flutter_mapbox_blog/helper/shared_prefs.dart';
 import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
 import 'package:get/get.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
-import '../helper/commons.dart';
-import '../widgets/carousel_card.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({Key? key}) : super(key: key);
@@ -22,17 +15,21 @@ class _NavigationPageState extends State<NavigationPage> {
   // Mapbox related]
   late CameraPosition _initialCameraPosition;
   late MapboxMapController controller;
-  List<MapMarker> mapMarkers = Get.arguments;
+  Map arguments = Get.arguments;
+  List<MapMarker> mapMarkers = [];
 
   @override
   void initState() {
     super.initState();
+    mapMarkers = arguments['Markers'];
     final latitude = mapMarkers.first.location!.latitude;
     final longitude = mapMarkers.first.location!.longitude;
     _initialCameraPosition = CameraPosition(
       target: LatLng(latitude, longitude),
       zoom: 17,
     );
+
+
 
     // Calculate the distance and time from data in SharedPreferences
     // for (int index = 0; index < restaurants.length; index++) {
@@ -57,25 +54,16 @@ class _NavigationPageState extends State<NavigationPage> {
     //         zoom: 15));
   }
 
-  _addSourceAndLineLayer(int index, bool removeLayer) async {
-    // Can animate camera to focus on the item
+  _addSourceAndLineLayer() async {
 
-    // Add a polyLine between source and destination
-    // var geometry = {
-    //   "coordinates": [
-    //     [lon, lat],
-    //     [lon, lat],
-    //     [lon, lat],
-    //     [lon, lat],
-    //     [lon, lat],
-    //     [lon, lat],
-    //     [lon, lat]
-    //   ],
-    //   "type": "LineString"
-    // };
+    final latitude = mapMarkers.first.location!.latitude;
+    final longitude = mapMarkers.first.location!.longitude;
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target:LatLng(latitude,longitude) ,
+        zoom: 15)));
 
     var geometry = {
-      "coordinates": mapMarkers.map((e) => [e.location!.latitude,e.location!.longitude]).toList(),
+      "coordinates":arguments['geometry'],
       "type": "LineString"
     };
 
@@ -86,28 +74,20 @@ class _NavigationPageState extends State<NavigationPage> {
           "type": "Feature",
           "id": 0,
           "properties": <String, dynamic>{},
-          "geometry": geometry,
+          "geometry": arguments['geometry']
         },
       ]
     };
-
-    // Remove lineLayer and source if it exists
-    if (removeLayer == true) {
-      await controller.removeLayer("lines");
-      await controller.removeSource("fills");
-    }
-
     // Add new source and lineLayer
     await controller.addSource("fills", GeojsonSourceProperties(data: _fills));
     await controller.addLineLayer(
       "fills",
       "lines",
-
       LineLayerProperties(
         lineColor: Colors.green.toHexStringRGB(),
         lineCap: "round",
         lineJoin: "round",
-        lineWidth: 2,
+        lineWidth: 4,
       ),
     );
   }
@@ -117,14 +97,16 @@ class _NavigationPageState extends State<NavigationPage> {
   }
 
   _onStyleLoadedCallback() async {
-    // for (CameraPosition _kRestaurant in _kRestaurantsList) {
-    //   await controller.addSymbol(SymbolOptions(
-    //     geometry: _kRestaurant.target,
-    //     iconSize: 0.2,
-    //     iconImage: "assets/icon/food.png",
-    //   ));
-    // }
-    // _addSourceAndLineLayer(0, false);
+    print("_onStyleLoadedCallback FLUTTER");
+    mapMarkers.forEach((e)async {
+      await controller.addSymbol(SymbolOptions(
+        geometry: LatLng(e.location!.latitude,e.location!.longitude),
+        iconSize: 0.2,
+        iconImage: "assets/icons/map-mark.png",
+      ));
+    });
+
+    _addSourceAndLineLayer();
   }
 
   @override
@@ -142,7 +124,6 @@ class _NavigationPageState extends State<NavigationPage> {
           onStyleLoadedCallback: _onStyleLoadedCallback,
           myLocationEnabled: true,
           myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
-          minMaxZoomPreference: const MinMaxZoomPreference(14, 17),
         ),
       ),
     );
