@@ -41,7 +41,7 @@ dependencies:
   shared_preferences:
   get_it:
   geocoding:
-  geolocator:
+#  geolocator:
   provider:
   carousel_slider:
   flutter_dotenv:

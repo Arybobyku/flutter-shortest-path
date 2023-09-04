@@ -3,7 +3,7 @@ import 'package:flutter_mapbox_blog/helper/belmandford.dart';
 import 'package:flutter_mapbox_blog/helper/directions_handler.dart';
 import 'package:flutter_mapbox_blog/helper/jhonson.dart';
 import 'package:flutter_mapbox_blog/models/map_marker_model.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 class CalculationProvider extends ChangeNotifier {
   List<MapEntry<String, double>>? belmanford;
@@ -18,7 +18,7 @@ class CalculationProvider extends ChangeNotifier {
   Future<Map> getDirectionsMap(List<MapMarker> markers)async{
     isLoadingMap = true;
     notifyListeners();
-    //
+
     // Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     // print("${position.latitude} ${position.longitude}");
     // markers.insert(0, MapMarker(image:"" , title: "Current Position", address: "Current Position", location: LatLng(position.latitude,position.longitude), rating: 0));
@@ -30,8 +30,8 @@ class CalculationProvider extends ChangeNotifier {
   }
 
   doCalculation(List<MapMarker> mapMarkers)async{
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    mapMarkers.insert(0, MapMarker(image:"" , title: "Current Position", address: "Current Position", location: LatLng(position.latitude,position.longitude), rating: 0));
+    // Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    // mapMarkers.insert(0, MapMarker(image:"" , title: "Current Position", address: "Current Position", location: LatLng(position.latitude,position.longitude), rating: 0));
     doCalculationBelmandFord(mapMarkers);
     doCalculationJhonson(mapMarkers);
   }
