@@ -1,5 +1,6 @@
 import 'package:flutter_mapbox_blog/pages/dashboard_page.dart';
 import 'package:flutter_mapbox_blog/pages/home_page.dart';
+import 'package:flutter_mapbox_blog/pages/navigation_page.dart';
 import 'package:flutter_mapbox_blog/pages/result_map_page.dart';
 import 'package:flutter_mapbox_blog/pages/result_page.dart';
 import 'package:flutter_mapbox_blog/pages/search_page.dart';
@@ -13,6 +14,7 @@ class Routes {
   static const String dashboard = "/dashboard";
   static const String result = "/result";
   static const String resultMap = "/resultMap";
+  static const String navigation = "/navigationPage";
 
   static final newRoutes = <GetPage>[
     GetPage(
@@ -38,7 +40,12 @@ class Routes {
     GetPage(
         name: resultMap,
         page: () {
-          return ResultMapPage();
+          return const ResultMapPage();
+        }),
+    GetPage(
+        name: navigation,
+        page: () {
+          return const NavigationPage();
         }),
   ];
 }

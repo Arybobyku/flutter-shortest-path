@@ -42,7 +42,12 @@ dependencies:
   get_it:
   geocoding:
   provider:
+  carousel_slider:
+  flutter_dotenv:
+#  flutter_mapbox_navigation:
+  mapbox_gl:
   http:
+  permission_handler:
 
 dev_dependencies:
   flutter_test:

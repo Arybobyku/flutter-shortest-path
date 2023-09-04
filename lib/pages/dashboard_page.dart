@@ -6,6 +6,7 @@ import 'package:flutter_mapbox_blog/widgets/button_rounded.dart';
 import 'package:get/get.dart';
 import 'package:mapbox_search/mapbox_search.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DashBoardPage extends StatefulWidget {
   const DashBoardPage({Key? key}) : super(key: key);
@@ -17,6 +18,11 @@ class DashBoardPage extends StatefulWidget {
 class _DashBoardPageState extends State<DashBoardPage> {
   List<MapBoxPlace> places = [];
 
+  @override
+  void initState() {
+    super.initState();
+   // Permission.location.request();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -35,7 +35,8 @@ class _ResultPageState extends State<ResultPage> {
         actions: [
           GestureDetector(
             onTap: () {
-              Get.toNamed(Routes.resultMap, arguments: mapResults);
+              // Get.toNamed(Routes.resultMap, arguments: mapResults);
+              Get.toNamed(Routes.navigation, arguments: mapResults);
             },
             child: const Icon(Icons.map),
           ),
