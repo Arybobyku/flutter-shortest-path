@@ -19,11 +19,22 @@ class CalculationProvider extends ChangeNotifier {
     isLoadingMap = true;
     notifyListeners();
 
+    List<MapEntry<String, double>>? parent = belmanford
+        ?.where((element) => !element.key.contains('Node'))
+        .toList();
+
+    List<MapMarker> newMapMarkers = [markers.first];
+
+
+    parent?.forEach((element) {
+      newMapMarkers.add(markers.firstWhere((markersElement) => element.key ==markersElement.title));
+    });
+
     // Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     // print("${position.latitude} ${position.longitude}");
     // markers.insert(0, MapMarker(image:"" , title: "Current Position", address: "Current Position", location: LatLng(position.latitude,position.longitude), rating: 0));
 
-    final result = await getDirectionsAPIResponse(markers);
+    final result = await getDirectionsAPIResponse(newMapMarkers);
     isLoadingMap = false;
     notifyListeners();
     return result;
