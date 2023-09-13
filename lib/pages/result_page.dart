@@ -209,9 +209,13 @@ class _ResultPageState extends State<ResultPage> {
                               itemBuilder: (context, parentIndex) {
                                 List<JohnsonResult>? child = value.jhonson
                                     .where((element) => element.key
-                                        .contains(parent![parentIndex].key))
+                                        .contains(parentJhonson[parentIndex].key))
                                     .toList();
 
+                                print("CHILD ${child[parentIndex].key}");
+                                print("PARENT ${value.jhonson[parentIndex].key}");
+
+                                print("\n\n");
                                 return Column(
                                   children: [
                                     Card(
@@ -272,11 +276,7 @@ class _ResultPageState extends State<ResultPage> {
                                                     children: [
                                                       Text(
                                                         child[index]
-                                                            .key
-                                                            .split(parentJhonson[
-                                                                    parentIndex]
-                                                                .key)
-                                                            .first,
+                                                            .key,
                                                         style: const TextStyle(
                                                             fontSize: 12),
                                                       ),

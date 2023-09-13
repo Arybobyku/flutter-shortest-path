@@ -234,6 +234,9 @@ Future<List<JohnsonResult>> calculationJhonson(
     shortestPath.add(JohnsonResult(key.key, value));
   });
 
+  shortestPath.removeWhere((element) => element.value == 0.0);
+  // shortestPath.sort((e1, e2) => e2.value.compareTo(e1.value));
+
   return shortestPath;
 }
 
