@@ -96,6 +96,10 @@ Future<List<MapEntry<String, double>>> calculationBellmanFord(
     }
   }
 
+  graph.currentGraph.forEach((key, value) {
+    print("Graph TEST ${key}: \n  ${value} `\n\n");
+  });
+
   var src = markers[indexSrc].title!;
 
   Map<String, double> distances = graph.bellmanFord(src);
@@ -104,6 +108,10 @@ Future<List<MapEntry<String, double>>> calculationBellmanFord(
 
   // results.removeWhere((element) => element.key.contains('Node'));
   results.removeWhere((element) => element.value == 0.0);
+
+  results.forEach((element) {
+    print("RESULTS ${element.key} => ${element.value}");
+  });
 
   return results;
 }

@@ -195,7 +195,7 @@ Future<List<JohnsonResult>> calculationJhonson(
 
     final steps = data['routes'][0]['legs'][0]['steps'];
 
-    for (int step = steps.length - 1; step > 0; step--) {
+    for (int step = steps.length - 1; step >= 0; step--) {
       graph.addVertex("Node ${markers[i].title} ${step - 1}");
       if (step == steps.length - 1) {
         graph.addEdge(
@@ -227,6 +227,12 @@ Future<List<JohnsonResult>> calculationJhonson(
     }
   }
 
+  graph.vertices.forEach((key, value) {
+    print("JHONSON GRAPH ${key} ");
+    value.pointsTo.forEach((key, value) {
+      print("/n ${key} : $value");
+    });
+  });
   var distance = johnson(graph);
 
   List<JohnsonResult> shortestPath = [];
@@ -235,6 +241,7 @@ Future<List<JohnsonResult>> calculationJhonson(
   });
 
   shortestPath.removeWhere((element) => element.value == 0.0);
+  shortestPath.removeWhere((element) => element.value == double.infinity);
   // shortestPath.sort((e1, e2) => e2.value.compareTo(e1.value));
 
   return shortestPath;

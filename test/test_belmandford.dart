@@ -13,23 +13,23 @@ void main() {
       image: 'assets/images/restaurant_1.jpg',
       title: 'Amplas',
       address: 'Amplas',
-      location: MapMarker.toLatLng(3.5424722435789127, 98.71752402741794),
+      location: MapMarker.toLatLng(3.553579,98.719958),
       rating: 4,
     ),
     MapMarker(
       image: 'assets/images/restaurant_1.jpg',
       title: 'Denai',
       address: 'Denai',
-      location: MapMarker.toLatLng(3.5835181755924177, 98.71531157048504),
+      location: MapMarker.toLatLng(3.552311,98.716971),
       rating: 4,
     ),
-    MapMarker(
-      image: 'assets/images/restaurant_1.jpg',
-      title: 'Menteng',
-      address: 'Menteng',
-      location: MapMarker.toLatLng(3.560779788289889, 98.72003659616716),
-      rating: 4,
-    ),
+    // MapMarker(
+    //   image: 'assets/images/restaurant_1.jpg',
+    //   title: 'Menteng',
+    //   address: 'Menteng',
+    //   location: MapMarker.toLatLng(3.560779788289889, 98.72003659616716),
+    //   rating: 4,
+    // ),
     // MapMarker(
     //     image: 'assets/images/restaurant_3.jpg',
     //     title: 'Pekan Baru',
@@ -74,6 +74,8 @@ void main() {
 
       final steps = data['routes'][0]['legs'][0]['steps'];
 
+      print("STEPS $steps");
+
       for (int step = steps.length - 1; step >= 0; step--) {
         if (step == steps.length - 1) {
           graph.addEdge(
@@ -106,7 +108,7 @@ void main() {
     }
 
     graph.currentGraph.forEach((key, value) {
-      print("Graph ${key}: \n  ${value} `\n\n");
+      print("Graph TEST ${key}: \n  ${value} `\n\n");
     });
 
     Map<String, double> distances = graph.bellmanFord(markers[0].title!);
@@ -116,7 +118,7 @@ void main() {
     results.removeWhere((element) => element.key.contains('Node'));
 
     results.forEach((element) {
-      print(element);
+      print("Setelah perhitungan ${element}");
     });
 
     // distances.forEach((key, value) {
