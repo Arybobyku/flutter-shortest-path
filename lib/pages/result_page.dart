@@ -231,7 +231,7 @@ class _ResultPageState extends State<ResultPage> {
                                                   const TextStyle(fontSize: 12),
                                             ),
                                             Text(
-                                              "${value.jhonson.last.value} Meter",
+                                              "${child.last.value} Meter",
                                               style: const TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold),

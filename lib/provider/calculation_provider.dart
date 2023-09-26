@@ -42,9 +42,9 @@ class CalculationProvider extends ChangeNotifier {
   }
 
   doCalculation(List<MapMarker> mapMarkers)async{
+    time2.start();
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     mapMarkers.insert(0, MapMarker(image:"" , title: "Current Position", address: "Current Position", location: LatLng(position.latitude,position.longitude), rating: 0));
-    time2.start();
     doCalculationBelmandFord(mapMarkers);
     doCalculationJhonson(mapMarkers);
   }
