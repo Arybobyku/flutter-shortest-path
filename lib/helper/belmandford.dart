@@ -21,17 +21,15 @@ class Graph {
     });
     distances[start] = 0;
 
-    for (int i = 0; i < currentGraph.length - 1; i++) {
-      currentGraph.forEach((u, edges) {
-        edges.forEach((v, weight) {
-          double distance = distances[u]! + weight;
-          if (distance < distances[v]!) {
-            distances[v] = distance;
-            predecessors[v] = u;
-          }
-        });
+    currentGraph.forEach((u, edges) {
+      edges.forEach((v, weight) {
+        double distance = distances[u]! + weight;
+        if (distance < distances[v]!) {
+          distances[v] = distance;
+          predecessors[v] = u;
+        }
       });
-    }
+    });
 
     // Check for negative-weight cycles
     currentGraph.forEach((u, edges) {

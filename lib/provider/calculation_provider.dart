@@ -42,7 +42,6 @@ class CalculationProvider extends ChangeNotifier {
   }
 
   doCalculation(List<MapMarker> mapMarkers)async{
-    time2.start();
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     mapMarkers.insert(0, MapMarker(image:"" , title: "Current Position", address: "Current Position", location: LatLng(position.latitude,position.longitude), rating: 0));
     doCalculationBelmandFord(mapMarkers);
@@ -58,6 +57,8 @@ class CalculationProvider extends ChangeNotifier {
   }
 
   Future<void> doCalculationJhonson(List<MapMarker> mapMarkers) async{
+    time2.start();
+    await Future.delayed(const Duration(milliseconds: 600));
     jhonson = await calculationJhonson(mapMarkers, 0);
     jhonson.sort((a,b)=> a.value.compareTo(b.value));
     time2.stop();
